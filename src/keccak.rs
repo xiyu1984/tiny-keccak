@@ -1,7 +1,6 @@
 //! The `Keccak` hash functions.
 
 use super::{bits_to_rate, keccakf::KeccakF, Hasher, KeccakState};
-use risc0_zkvm::guest::env;
 
 /// The `Keccak` hash functions defined in [`Keccak SHA3 submission`].
 ///
@@ -71,7 +70,7 @@ impl Hasher for Keccak {
     /// # }
     /// ```
     fn update(&mut self, input: &[u8]) {
-        env::keccak_update(input);
+        self.state.update(input);
     }
 
     /// Pad and squeeze the state to the output.
@@ -89,6 +88,6 @@ impl Hasher for Keccak {
     /// #
     /// ```
     fn finalize(self, output: &mut [u8]) {
-        env::keccak_finalize(output);
+        self.state.finalize(output);
     }
 }

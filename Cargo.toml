@@ -13,7 +13,7 @@ categories = ["cryptography", "no-std"]
 
 [dependencies]
 crunchy = "0.2.2"
-risc0-zkvm = { path = "../risc0/risc0/zkvm", default-features = false }
+risc0-zkvm-platform = { path = "../risc0/risc0/zkvm/platform", default-features = false, features = ["export-syscalls"] }
 
 [profile.dev]
 opt-level = 3  # Controls the --opt-level the compiler builds with

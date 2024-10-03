@@ -371,6 +371,7 @@ struct KeccakState<P> {
     rate: usize,
     delim: u8,
     mode: Mode,
+    fd: u32,
     permutation: core::marker::PhantomData<P>,
 }
 
@@ -382,6 +383,7 @@ impl<P> Clone for KeccakState<P> {
             rate: self.rate,
             delim: self.delim,
             mode: self.mode,
+            fd: self.fd,
             permutation: core::marker::PhantomData,
         }
     }
@@ -390,12 +392,16 @@ impl<P> Clone for KeccakState<P> {
 impl<P: Permutation> KeccakState<P> {
     fn new(rate: usize, delim: u8) -> Self {
         assert!(rate != 0, "rate cannot be equal 0");
+        let mut fd: u32 = 0;
+        let status = unsafe { risc0_zkvm_platform::syscall::sys_keccak_open(&mut fd as *mut u32)};
+        assert!(status == 0);
         KeccakState {
             buffer: Buffer::default(),
             offset: 0,
             rate,
             delim,
             mode: Mode::Absorbing,
+            fd,
             permutation: core::marker::PhantomData,
         }
     }
