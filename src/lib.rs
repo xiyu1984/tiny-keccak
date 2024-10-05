@@ -390,6 +390,13 @@ impl<P> Clone for KeccakState<P> {
     }
 }
 
+impl<P> Drop for KeccakState<P> {
+    fn drop(&mut self) {
+        let status = unsafe { risc0_zkvm_platform::syscall::sys_keccak_close(self.fd)};
+        assert!(status == 0);
+    }
+}
+
 impl<P: Permutation> KeccakState<P> {
     fn new(rate: usize, delim: u8) -> Self {
         assert!(rate != 0, "rate cannot be equal 0");
