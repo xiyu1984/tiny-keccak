@@ -165,6 +165,7 @@ pub use keccak::Keccak;
 mod shake;
 
 use risc0_zkvm_platform::syscall::{sys_keccak_absorb, sys_keccak_squeeze, DIGEST_WORDS};
+use risc0_zkvm::guest::env;
 #[cfg(feature = "shake")]
 pub use shake::Shake;
 
@@ -419,7 +420,10 @@ impl<P: Permutation> KeccakState<P> {
     }
 
     fn update(&mut self, input: &[u8]) {
-        unsafe{ sys_keccak_absorb(self.fd, input.as_ptr() as *const u8, input.len())}
+        unsafe {
+            env::KECCAK_BATCHER.write_data(input).unwrap();
+            sys_keccak_absorb(self.fd, input.as_ptr() as *const u8, input.len())
+        };
     }
 
     fn pad(&mut self) {
@@ -427,7 +431,11 @@ impl<P: Permutation> KeccakState<P> {
     }
 
     fn squeeze(&mut self, output: &mut [u8]) {
-        unsafe { sys_keccak_squeeze(self.fd, output.as_ptr() as *mut [u32; DIGEST_WORDS])}
+        unsafe {
+            sys_keccak_squeeze(self.fd, output.as_ptr() as *mut [u32; DIGEST_WORDS]);
+            env::KECCAK_BATCHER.write_padding().unwrap();
+            env::KECCAK_BATCHER.write_hash(&output).unwrap();
+        }
     }
 
     fn finalize(mut self, output: &mut [u8]) {
