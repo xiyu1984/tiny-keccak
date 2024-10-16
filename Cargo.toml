@@ -16,8 +16,10 @@ crunchy = "0.2.2"
 
 # note: branch named is used instead of rev as temporary measure to facilitate testing
 [target.'cfg(target_os = "zkvm")'.dependencies]
-risc0-zkvm-platform = { git = "https://github.com/risc0/risc0.git", branch = "erik/keccak-plumbing", default-features = false, features = ["export-syscalls"] }
-risc0-zkvm = { git = "https://github.com/risc0/risc0.git", branch = "erik/keccak-plumbing", default-features = false, feature = ["std"] }
+risc0-zkvm-platform = { git = "https://github.com/risc0/risc0.git", rev = "8b23b688e344d447c02cf608f66fd1f42756210e", default-features = false, features = ["export-syscalls"] }
+risc0-zkvm = { git = "https://github.com/risc0/risc0.git", rev = "8b23b688e344d447c02cf608f66fd1f42756210e", default-features = false }
+#risc0-zkvm-platform = { path = "../risc0/risc0/zkvm/platform", default-features = false, features = ["export-syscalls"] }
+#risc0-zkvm = { path = "../risc0/risc0/zkvm", default-features = false }
 
 [profile.dev]
 opt-level = 3  # Controls the --opt-level the compiler builds with

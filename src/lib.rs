@@ -38,7 +38,7 @@
 //! [`@oleganza`]: https://github.com/oleganza
 //! [`CC0`]: https://github.com/debris/tiny-keccak/blob/master/LICENSE
 
-//#![no_std]
+#![no_std]
 #![deny(missing_docs)]
 
 const RHO: [u32; 24] = [
