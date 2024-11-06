@@ -431,8 +431,9 @@ impl<P: Permutation> KeccakState<P> {
 
     fn update(&mut self, input: &[u8]) {
         #[cfg(target_os = "zkvm")]
+        env::write_keccak_batcher(input).unwrap();
+        #[cfg(target_os = "zkvm")]
         unsafe {
-            env::KECCAK_BATCHER.write_data(input).unwrap();
             sys_keccak_absorb(self.fd, input.as_ptr() as *const u8, input.len())
         };
         #[cfg(not(target_os = "zkvm"))]
@@ -494,9 +495,12 @@ impl<P: Permutation> KeccakState<P> {
         #[cfg(target_os = "zkvm")]
         unsafe {
             sys_keccak_squeeze(self.fd, output.as_ptr() as *mut [u32; DIGEST_WORDS]);
-            env::KECCAK_BATCHER.write_padding().unwrap();
-            env::KECCAK_BATCHER.write_hash(&output).unwrap();
         }
+        #[cfg(target_os = "zkvm")]
+        env::pad_keccak_batcher().unwrap();
+        #[cfg(target_os = "zkvm")]
+        env::write_keccak_hash(&output).unwrap();
+
     }
 
     fn finalize(mut self, output: &mut [u8]) {
