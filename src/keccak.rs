@@ -5,6 +5,12 @@ use super::{bits_to_rate, keccakf::KeccakF, Hasher, KeccakState};
 extern crate alloc;
 #[cfg(target_os = "zkvm")]
 use alloc::{vec, vec::Vec};
+#[cfg(target_os = "zkvm")]
+use anyhow::Result;
+
+#[cfg(target_os = "zkvm")]
+extern "Rust" { fn keccak_digest(input: &[u8], delim: u8) -> Result<[u8; 32]>; }
+
 /// The `Keccak` hash functions defined in [`Keccak SHA3 submission`].
 ///
 /// # Usage
@@ -126,7 +132,7 @@ impl Hasher for Keccak {
         if self.slow_path {
             self.state.finalize(output);
         } else {
-            output.clone_from_slice(&risc0_zkvm::guest::env::keccak_digest(&self.raw_data, Self::DELIM).unwrap().as_mut_slice());
+            output.clone_from_slice(&unsafe{keccak_digest(&self.raw_data, Self::DELIM).unwrap().as_mut_slice()});
         }
     }
 }
