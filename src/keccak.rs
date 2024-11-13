@@ -11,6 +11,15 @@ use anyhow::Result;
 #[cfg(target_os = "zkvm")]
 extern "Rust" { fn keccak_digest(input: &[u8], delim: u8) -> Result<[u8; 32]>; }
 
+// the input transcript must have 8 bytes for block count, 32 bytes for the
+// hash, and 8 bytes of 0's at the very end.
+#[cfg(target_os = "zkvm")]
+const TRANSCRIPT_MINIMUM: usize = 8 + 32 + 8 ;
+#[cfg(target_os = "zkvm")]
+const KECCAK_TRANSCRIPT_LIMIT: usize = 100_000;
+#[cfg(target_os = "zkvm")]
+const KECCAK_INPUT_LIMIT: usize = KECCAK_TRANSCRIPT_LIMIT - TRANSCRIPT_MINIMUM;
+
 /// The `Keccak` hash functions defined in [`Keccak SHA3 submission`].
 ///
 /// # Usage
@@ -94,7 +103,7 @@ impl Hasher for Keccak {
     #[cfg(target_os = "zkvm")]
     fn update(&mut self, input: &[u8]) {
         if !self.slow_path {
-            if self.raw_data.len() + input.len() > 100_000 {
+            if self.raw_data.len() + input.len() > KECCAK_LIMIT {
                 self.slow_path = true;
                 self.state.update(&self.raw_data);
             }
