@@ -9,12 +9,14 @@ use alloc::{vec, vec::Vec};
 use anyhow::Result;
 
 #[cfg(target_os = "zkvm")]
-extern "Rust" { fn keccak_digest(input: &[u8], delim: u8) -> Result<[u8; 32]>; }
+extern "Rust" {
+    fn keccak_digest(input: &[u8], delim: u8) -> Result<[u8; 32]>;
+}
 
 // the input transcript must have 8 bytes for block count, 32 bytes for the
 // hash, and 8 bytes of 0's at the very end.
 #[cfg(target_os = "zkvm")]
-const TRANSCRIPT_MINIMUM: usize = 8 + 32 + 8 ;
+const TRANSCRIPT_MINIMUM: usize = 8 + 32 + 8;
 #[cfg(target_os = "zkvm")]
 const KECCAK_TRANSCRIPT_LIMIT: usize = 100_000;
 #[cfg(target_os = "zkvm")]
@@ -106,8 +108,7 @@ impl Hasher for Keccak {
             if self.raw_data.len() + input.len() > KECCAK_INPUT_LIMIT {
                 self.slow_path = true;
                 self.state.update(&self.raw_data);
-            }
-            else {
+            } else {
                 self.raw_data.extend_from_slice(input);
             }
         }
@@ -141,7 +142,11 @@ impl Hasher for Keccak {
         if self.slow_path {
             self.state.finalize(output);
         } else {
-            output.clone_from_slice(&unsafe{keccak_digest(&self.raw_data, Self::DELIM).unwrap().as_mut_slice()});
+            output.clone_from_slice(&unsafe {
+                keccak_digest(&self.raw_data, Self::DELIM)
+                    .unwrap()
+                    .as_mut_slice()
+            });
         }
     }
 }
