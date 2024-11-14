@@ -103,7 +103,7 @@ impl Hasher for Keccak {
     #[cfg(target_os = "zkvm")]
     fn update(&mut self, input: &[u8]) {
         if !self.slow_path {
-            if self.raw_data.len() + input.len() > KECCAK_LIMIT {
+            if self.raw_data.len() + input.len() > KECCAK_INPUT_LIMIT {
                 self.slow_path = true;
                 self.state.update(&self.raw_data);
             }
