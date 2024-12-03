@@ -35,6 +35,8 @@ pub struct KeccakF;
 
 impl Permutation for KeccakF {
     fn execute(buffer: &mut Buffer) {
+        #[cfg(target_os = "zkvm")]
+        println!("update called");
         keccakf(buffer.words());
     }
 }
