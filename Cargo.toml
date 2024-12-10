@@ -15,7 +15,7 @@ categories = ["cryptography", "no-std"]
 crunchy = "0.2.2"
 
 [target.'cfg(target_os = "zkvm")'.dependencies]
-anyhow = "1.0"
+risc0-zkvm = { version = "1.2.1-rc.0", default-features = false, features = ["std", "unstable"]}
 
 [profile.dev]
 opt-level = 3  # Controls the --opt-level the compiler builds with
